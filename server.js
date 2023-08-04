@@ -2,7 +2,7 @@ const http = require('http');
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
-const server = http.createServer(app)
+const server = http.createServer(app);
 const port = 3000;
 const localIP = '192.168.37.242';
 
@@ -39,7 +39,21 @@ app.post('/login', (req, res) => {
 
     if (results.length === 1) {
       // Voter credentials are valid
-      res.send('Login Successful');
+
+      // Check if the voter has already voted
+      const voterID = results[0].voterID;
+      const checkVoteSql = 'SELECT * FROM votes WHERE voterID = ?';
+      connection.query(checkVoteSql, [voterID], (err, voteResults) => {
+        if (err) throw err;
+
+        if (voteResults.length > 0) {
+          // Voter has already voted, send a warning message upon successful login
+          res.json({ warning: 'Warning: You have already cast your vote.' });
+        } else {
+          // Voter has not voted yet, proceed with login
+          res.json({ message: 'Login Successful' }); // Send a JSON response
+        }
+      });
     } else {
       // Invalid credentials
       res.status(401).send('Invalid credentials. Please try again.');
@@ -48,17 +62,29 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/vote', (req, res) => {
-  const { candidate } = req.body; // Ensure this line is present to extract "candidate" from the request body
+  const { candidate, voterID } = req.body;
 
-  // Insert the vote data into the "votes" table
-  const sql = 'INSERT INTO votes (candidate) VALUES (?)';
-  connection.query(sql, [candidate], (err, result) => {
+  // Check if the voter has already voted
+  const checkVoteSql = 'SELECT * FROM votes WHERE voterID = ?';
+  connection.query(checkVoteSql, [voterID], (err, voteResults) => {
     if (err) {
-      console.error('Error storing vote:', err);
-      res.status(500).send('Error storing vote.');
+      console.error('Error checking vote:', err);
+      res.status(500).send('Error checking vote.');
+    } else if (voteResults.length > 0) {
+      // Voter has already voted, send an error message
+      res.status(400).send('Error: You have already cast your vote.');
     } else {
-      console.log('Vote successfully recorded:', result);
-      res.send('Vote Successful');
+      // Insert the vote data into the "votes" table
+      const insertVoteSql = 'INSERT INTO votes (candidate, voterID) VALUES (?, ?)';
+      connection.query(insertVoteSql, [candidate, voterID], (err, result) => {
+        if (err) {
+          console.error('Error storing vote:', err);
+          res.status(500).send('Error storing vote.');
+        } else {
+          console.log('Vote successfully recorded:', result);
+          res.send('Vote Successful');
+        }
+      });
     }
   });
 });
