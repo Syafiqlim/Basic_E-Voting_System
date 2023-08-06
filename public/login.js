@@ -13,15 +13,9 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
   });
 
   // Check the response and handle accordingly
-  const responseData = await response.json();
   if (response.ok) {
-    if (responseData.warning) {
-      // Voter has already voted, show a warning message
-      alert(responseData.warning);
-    } else {
-      // Successful login, redirect to the vote form
-      window.location.href = '/vote.html';
-    }
+    // Successful login, redirect to the vote form
+    window.location.href = '/vote.html';
   } else {
     // Login failed, display an error message
     alert('Login failed. Please check your credentials and try again.');
