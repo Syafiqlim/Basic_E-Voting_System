@@ -1,4 +1,3 @@
-// vote.js
 document.getElementById('voteForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const candidate = document.getElementById('candidate').value;
@@ -23,6 +22,11 @@ document.getElementById('voteForm').addEventListener('submit', async (event) => 
   if (response.ok) {
     // Vote successful, show a confirmation message
     alert('Vote successfully recorded. Thank you for voting!');
+
+    // Redirect to the index.html page after a short delay (e.g., 1 second)
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 1000); // Adjust the delay as needed (1000 milliseconds = 1 second)
   } else if (response.status === 403) {
     // Voter has already voted, display a warning message
     alert('You have already cast your vote.');
