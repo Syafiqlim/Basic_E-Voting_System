@@ -1,9 +1,10 @@
+// vote.js
 document.getElementById('voteForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const candidate = document.getElementById('candidate').value;
 
-  // Get the voterID from localStorage (if stored during login)
-  const voterID = localStorage.getItem('voterID');
+  // Get the voterID from the session (if stored during login)
+  const voterID = sessionStorage.getItem('voterID');
   if (!voterID) {
     alert('VoterID not found. Please log in again.');
     return;
@@ -13,9 +14,9 @@ document.getElementById('voteForm').addEventListener('submit', async (event) => 
   const response = await fetch('/vote', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ candidate, voterID })
+    body: JSON.stringify({ candidate, voterID }),
   });
 
   // Check the response and handle accordingly

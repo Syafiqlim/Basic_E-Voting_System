@@ -1,3 +1,4 @@
+// login.js
 document.getElementById('loginForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const voterID = document.getElementById('voterID').value;
@@ -7,14 +8,15 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
   const response = await fetch('/login', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ voterID, password })
+    body: JSON.stringify({ voterID, password }),
   });
 
   // Check the response and handle accordingly
   if (response.ok) {
-    // Successful login, redirect to the vote form
+    // Successful login, save the voterID to the session and redirect to the vote form
+    sessionStorage.setItem('voterID', voterID);
     window.location.href = '/vote.html';
   } else {
     // Login failed, display an error message

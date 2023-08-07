@@ -5,6 +5,7 @@ const os = require('os');
 const app = express();
 const server = http.createServer(app);
 const port = 3000;
+const session = require('express-session');
 
 // Function to find the local IP address of a specific network adapter
 function findLocalIP() {
@@ -24,6 +25,16 @@ if (!localIP) {
   console.error('Error: Network adapter not found.');
   process.exit(1);
 }
+
+// Add express-session middleware
+app.use(
+  session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
 
 // Create a MySQL database connection
 const connection = mysql.createConnection({
